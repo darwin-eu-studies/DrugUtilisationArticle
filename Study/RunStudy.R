@@ -1,4 +1,3 @@
-dropTable(cdm, everything())
 # parameters ----
 ingredient <- "simvastatin"
 ageGroup <- list(c(0, 19), c(20, 39), c(40, 59), c(60, 79), c(80, 150))
@@ -329,3 +328,7 @@ zip(
 
 # drop the permanent tables created during the analysis ----
 # dropTable(cdm, everything(), TRUE)
+
+# happy for the long journey
+cli::cli_inform(c("v" = "Study fnished"))
+cli::cli_inform(c("i" = "Please see the zip folder created with all the generated csv files"))

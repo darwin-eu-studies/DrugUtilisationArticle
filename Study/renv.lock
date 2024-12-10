@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.4.0",
+    "Version": "4.4.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -11,9 +11,15 @@
   "Packages": {
     "CDMConnector": {
       "Package": "CDMConnector",
-      "Version": "1.5.0",
+      "Version": "1.6.1",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "CDMConnector",
+      "RemoteRef": "CDMConnector",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.6.1",
       "Requirements": [
         "DBI",
         "R",
@@ -38,13 +44,19 @@
         "waldo",
         "withr"
       ],
-      "Hash": "2bae94aed83da2007c938f3d2fa1a48f"
+      "Hash": "1b6e550b3f742dab03099f3768595b98"
     },
     "CodelistGenerator": {
       "Package": "CodelistGenerator",
-      "Version": "3.2.0",
+      "Version": "3.3.1",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "CodelistGenerator",
+      "RemoteRef": "CodelistGenerator",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "3.3.1",
       "Requirements": [
         "DBI",
         "PatientProfiles",
@@ -54,9 +66,7 @@
         "cli",
         "dplyr",
         "glue",
-        "lifecycle",
         "lubridate",
-        "magrittr",
         "omopgenerics",
         "purrr",
         "rlang",
@@ -66,7 +76,35 @@
         "vctrs",
         "visOmopResults"
       ],
-      "Hash": "6fe0971fca9c57721e4734a3e5c27d98"
+      "Hash": "6f3b1e7f2df8ba5441d0ab1ea62486d9"
+    },
+    "CohortCharacteristics": {
+      "Package": "CohortCharacteristics",
+      "Version": "0.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "CohortCharacteristics",
+      "RemoteRef": "CohortCharacteristics",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "0.4.0",
+      "Requirements": [
+        "CDMConnector",
+        "PatientProfiles",
+        "R",
+        "cli",
+        "dplyr",
+        "lifecycle",
+        "omopgenerics",
+        "purrr",
+        "rlang",
+        "snakecase",
+        "stringr",
+        "tidyr",
+        "visOmopResults"
+      ],
+      "Hash": "d729272fbcce172fe82007b6fd6b6060"
     },
     "DBI": {
       "Package": "DBI",
@@ -81,18 +119,22 @@
     },
     "DrugUtilisation": {
       "Package": "DrugUtilisation",
-      "Version": "0.7.1",
+      "Version": "0.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "DrugUtilisation",
+      "RemoteRef": "DrugUtilisation",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "source",
+      "RemoteSha": "0.8.0",
       "Requirements": [
         "CDMConnector",
         "CodelistGenerator",
         "PatientProfiles",
         "R",
-        "checkmate",
         "cli",
         "clock",
-        "dbplyr",
         "dplyr",
         "glue",
         "lifecycle",
@@ -100,16 +142,21 @@
         "purrr",
         "rlang",
         "stringr",
-        "tidyr",
-        "visOmopResults"
+        "tidyr"
       ],
-      "Hash": "38ed0e5274c5d81fa6d965c3cdae15db"
+      "Hash": "3863da9c6d3d569f1f4f3db5fc149a10"
     },
     "IncidencePrevalence": {
       "Package": "IncidencePrevalence",
-      "Version": "0.7.4",
+      "Version": "0.9.0",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "IncidencePrevalence",
+      "RemoteRef": "IncidencePrevalence",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "0.9.0",
       "Requirements": [
         "CDMConnector",
         "PatientProfiles",
@@ -121,37 +168,39 @@
         "dplyr",
         "glue",
         "lifecycle",
-        "lubridate",
         "magrittr",
         "omopgenerics",
         "purrr",
         "rlang",
         "stringr",
-        "tidyr",
-        "visOmopResults"
+        "tidyr"
       ],
-      "Hash": "644352fe1c48cab082e268f0c5a04002"
+      "Hash": "7c50a4e7aefaa1eb96690a6cad41b1f4"
     },
     "PatientProfiles": {
       "Package": "PatientProfiles",
-      "Version": "1.2.0",
+      "Version": "1.2.2",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "PatientProfiles",
+      "RemoteRef": "PatientProfiles",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.2.2",
       "Requirements": [
         "CDMConnector",
         "R",
         "cli",
         "dplyr",
         "lifecycle",
-        "magrittr",
         "omopgenerics",
         "purrr",
         "rlang",
         "stringr",
-        "tidyr",
-        "visOmopResults"
+        "tidyr"
       ],
-      "Hash": "7923f16a151c8d02eefbf31489219764"
+      "Hash": "87b3c5ddb1c4bc1f464115f610325c0e"
     },
     "R6": {
       "Package": "R6",
@@ -314,6 +363,12 @@
       "Version": "2.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "dbplyr",
+      "RemoteRef": "dbplyr",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "2.5.0",
       "Requirements": [
         "DBI",
         "R",
@@ -357,6 +412,12 @@
       "Version": "1.1.4",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "dplyr",
+      "RemoteRef": "dplyr",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.1.4",
       "Requirements": [
         "R",
         "R6",
@@ -499,14 +560,21 @@
     },
     "omopgenerics": {
       "Package": "omopgenerics",
-      "Version": "0.3.1",
+      "Version": "0.4.1",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "omopgenerics",
+      "RemoteRef": "omopgenerics",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "0.4.1",
       "Requirements": [
         "R",
         "cli",
         "dbplyr",
         "dplyr",
+        "generics",
         "glue",
         "lifecycle",
         "methods",
@@ -517,7 +585,7 @@
         "tidyr",
         "vctrs"
       ],
-      "Hash": "c17db6329c631b9010951ad112341ba3"
+      "Hash": "072f4e363174ababd20aeab7926d5797"
     },
     "pillar": {
       "Package": "pillar",
@@ -722,6 +790,12 @@
       "Version": "1.3.1",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "tidyr",
+      "RemoteRef": "tidyr",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "1.3.1",
       "Requirements": [
         "R",
         "cli",
@@ -804,9 +878,15 @@
     },
     "visOmopResults": {
       "Package": "visOmopResults",
-      "Version": "0.4.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "visOmopResults",
+      "RemoteRef": "visOmopResults",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
+      "RemoteSha": "0.5.0",
       "Requirements": [
         "cli",
         "dplyr",
@@ -819,7 +899,7 @@
         "stringr",
         "tidyr"
       ],
-      "Hash": "6c41fbd15141fb7d729ee868b4a2ce99"
+      "Hash": "bfed3aa894cfd8264c184cd867581258"
     },
     "vroom": {
       "Package": "vroom",

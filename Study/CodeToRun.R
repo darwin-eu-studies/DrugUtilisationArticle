@@ -1,3 +1,4 @@
+# Restore the renv to start
 renv::activate()
 renv::restore()
 
@@ -13,40 +14,23 @@ library(readr)
 library(zip)
 library(IncidencePrevalence)
 library(CohortCharacteristics)
-# Connection details
-server_dbi<-"..."
-port<-Sys.getenv("DB_PORT")
-host<-Sys.getenv("DB_HOST")
-user<-Sys.getenv("DB_USER")
-password<-Sys.getenv("DB_PASSWORD")
 
-db <- dbConnect(RPostgres::Postgres(),
-                dbname = server_dbi,
-                port = port,
-                host = host,
-                user = user,
-                password = password)
+# Connection details
+db <- DBI::dbConnect("...")
 
 # connection details
-databaseAcronym <- "CPRD_GOLD"
-cdmDatabaseSchema <- "public_100k"
-resultsDatabaseSchema <- "results"
-resultsStem <- "dus_yg_"
+databaseAcronym <- "..."
+cdmDatabaseSchema <- "..."
+resultsDatabaseSchema <- "..."
+resultsStem <- "..."
 
-cdm <- cdmFromCon(
+cdm <- CDMConnector::cdmFromCon(
   con = db,
-  cdmSchema = c(schema = cdmDatabaseSchema),
-  writeSchema = c(schema = resultsDatabaseSchema, prefix = resultsStem),
-  cdmName = databaseAcronym
+  cdmSchema = cdmDatabaseSchema,
+  writeSchema = resultsDatabaseSchema,
+  cdmName = databaseAcronym,
+  writePrefix = resultsStem
 )
-
-# Count number of individuals in database to see if we connected correctly
-cdm$person %>%
-  tally() %>%
-  computeQuery()
 
 # run analysis
 source("RunStudy.R")
-
-# happy for the long journey
-cat("Study finished\n-Please see the zip folder created with all the generated csv files")
