@@ -1,176 +1,158 @@
-dropTable(cdm, everything())
 # parameters ----
-ingredient <- "simvastatin"
 ageGroup <- list(c(0, 19), c(20, 39), c(40, 59), c(60, 79), c(80, 150))
 strata <- list("age_group", "sex", c("age_group", "sex"))
-alternativeIngredients <- c(
-  "lovastatin", "pravastatin", "fluvastatin", "atorvastatin", "cerivastatin",
-  "rosuvastatin", "pitavastatin", "ezetimibe", "evolocumab", "alirocumab",
-  "evinacumb"
-)
+prevalentCohort <- "prevalent_users_cohort"
+newUsersCohort <- "new_users_cohort"
+newUsersWithFuturePrescriptions <- "new_users_future"
+denominatorCohort <- "denominator"
+conditionsCohort <- "conditions"
+medicationsCohort <- "medications"
+indicationCohort <- "indications"
+alternativeCohort <- "alternative"
+studyPeriod <- as.Date(c("2010-01-01", "2021-12-31"))
+ingredientConceptId <- 1539403
 
 # initiate project ----
-# create results folder
-resultsFolder <- here("Results")
-if (!dir.exists(resultsFolder)) {
-  dir.create(resultsFolder)
+resultsFolder <- here::here("Results")
+if (!dir.exists(resultsFolder)) dir.create(resultsFolder)
+logName <- paste0("log_", format(Sys.time(), "%Y_%m_%d_%H_%M_%S"), ".txt")
+logFile <- file.path(resultsFolder, logName)
+logger <- log4r::create.logger(logfile = logFile, level = "INFO")
+printLog <- function(logger, message, nm = "i") {
+  log4r::info(logger, message)
+  date <- format(Sys.time(), '%Y-%m-%d %H:%M:%S')
+  "{.pkg {date}} {message}" |>
+    rlang::set_names(nm) |>
+    cli::cli_inform()
 }
-# create log file
-logFile <- here(resultsFolder, "log.txt")
-if (file.exists(logFile)) {
-  unlink(logFile)
-}
-logger <- create.logger()
-logfile(logger) <- logFile
-level(logger) <- "INFO"
-info(logger, "LOGGER CREATED")
+printLog(logger, "Log file created", "v")
+
+# read codelists ----
+printLog(logger, "Reading codelists")
+codes <- omopgenerics::importCodelist(
+  path = here::here("Codelists", "Ingredients"), type = "csv"
+)
+simvastatin <- codes["simvastatin"]
+alternativeIngredients <- codes[names(codes) != "simvastatin"]
+conditions <- omopgenerics::importCodelist(
+  path = here::here("Codelists", "Conditions"), type = "csv"
+)
+medications <- omopgenerics::importCodelist(
+  path = here::here("Codelists", "Medications"), type = "csv"
+)
+indications <- omopgenerics::importCodelist(
+  path = here::here("Codelists", "Indication"), type = "csv"
+)
+printLog(logger, "All codelist imported", "v")
 
 # cdm snapshot ----
-info(logger, "CDM SNAPSHOT")
-write_csv(snapshot(cdm), here(resultsFolder, paste0("cdmSnapshot_",
-                                                    databaseAcronym,
-                                                    ".csv")))
-info(logger, "CDM SNAPSHOT DONE")
-
-
+printLog(logger, "Extracting cdm snapshot")
+snapshot <- OmopSketch::summariseOmopSnapshot(cdm)
+printLog(logger, "cdm snapshot done", "v")
 
 # create prevalent user cohorts ----
-info(logger, "CREATE PREVALENT USER COHORTS")
-info(logger, "get concept ids from ingredient")
-conceptSet <- getDrugIngredientCodes(cdm = cdm, name = ingredient)
-names(conceptSet) <- paste0("prevalent_", ingredient)
-info(logger, "instantiate new users cohort")
-cdm <- generateDrugUtilisationCohortSet(
+printLog(logger, "Create prevalent users cohorts")
+cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(
   cdm = cdm,
-  conceptSet = conceptSet,
-  name = "prevalent_users_cohort",
-  priorObservation = NULL,
-  gapEra = 30,
-  priorUseWashout = 0,
-  limit = "all",
-  imputeDuration = "none"
+  conceptSet = simvastatin,
+  name = prevalentCohort,
+  gapEra = 30
 )
-info(logger, "export pevalent users cohort")
-prevalentUserCohorts <- settings(cdm$prevalent_users_cohort) %>%
-  inner_join(attrition(cdm$prevalent_users_cohort), by = "cohort_definition_id") %>%
-  addCdmName(cdm) %>%
-  mutate(table_name = attr(cdm$prevalent_users_cohort, "table_name"))
-write_csv(prevalentUserCohorts, here(resultsFolder, paste0("prevalentUsersCohort_",
-                                                           databaseAcronym,
-                                                           ".csv")))
-info(logger, "PREVALENT USER COHORTS CREATED")
+countsPrevalent <- cdm[[prevalentCohort]] |>
+  CohortCharacteristics::summariseCohortCount()
+attritionPrevalent <- cdm[[prevalentCohort]] |>
+  CohortCharacteristics::summariseCohortAttrition()
+printLog(logger, "Prevalent cohorts instantiated", "v")
 
 # incidence and prevalence ----
-info(logger, "COMPUTE INCIDENCE AND PREVALENCE")
-info(logger, "compute denominator")
-cdm <- generateDenominatorCohortSet(
+printLog(logger, "Create denominator cohorts")
+cdm <- IncidencePrevalence::generateDenominatorCohortSet(
   cdm = cdm,
-  name = "denominator",
-  cohortDateRange = as.Date(c("2017-01-01", "2021-12-31")),
+  name = denominatorCohort,
+  cohortDateRange = studyPeriod,
   ageGroup = c(list(c(0, 150)), ageGroup),
   sex = c("Both", "Male", "Female"),
   daysPriorObservation = 365,
   requirementInteractions = TRUE
 )
+countsDenominator <- cdm[[denominatorCohort]] |>
+  CohortCharacteristics::summariseCohortCount()
+attritionDenominator <- cdm[[denominatorCohort]] |>
+  CohortCharacteristics::summariseCohortAttrition()
+printLog(logger, "Denominator cohorts created", "v")
 
-info(logger, "compute prevalence")
-prev <- estimatePeriodPrevalence(
+printLog(logger, "Calculate period prevalence")
+prevalence <- IncidencePrevalence::estimatePeriodPrevalence(
   cdm = cdm,
-  denominatorTable = "denominator",
-  outcomeTable = "prevalent_users_cohort",
+  denominatorTable = denominatorCohort,
+  outcomeTable = prevalentCohort,
   interval = c("months", "years")
 )
+printLog(logger, "Period prevalence calculated", "v")
 
-write_csv(prev, here(resultsFolder, paste0("prevalence_",
-                                           databaseAcronym,
-                                           ".csv")))
-
-write_csv(attrition(prev), here(resultsFolder, paste0("prevalence_attrition_",
-                                                      databaseAcronym,
-                                                      ".csv")))
-
-
-
-info(logger, "compute incidence")
-inc <- estimateIncidence(
+printLog(logger, "Calculate incidence")
+incidence <- IncidencePrevalence::estimateIncidence(
   cdm = cdm,
-  denominatorTable = "denominator",
-  outcomeTable = "prevalent_users_cohort",
+  denominatorTable = denominatorCohort,
+  outcomeTable = prevalentCohort,
   outcomeWashout = 365,
   interval = c("months", "years")
 )
-
-write_csv(inc, here(resultsFolder, paste0("incidence_",
-                                          databaseAcronym,
-                                          ".csv")))
-
-write_csv(attrition(inc), here(resultsFolder, paste0("incidence_attrition_",
-                                                     databaseAcronym,
-                                                     ".csv")))
-info(logger, "INCIDENCE AND PREVALENCE COMPUTED")
-
+printLog(logger, "Incidence calculated", "v")
 
 # create new user cohorts ----
-info(logger, "CREATE NEW USER COHORTS")
-info(logger, "instantiate new users cohort")
-names(conceptSet) <- paste0("new_", ingredient)
-cdm <- generateDrugUtilisationCohortSet(
-  cdm = cdm,
-  conceptSet = conceptSet,
-  name = "new_users_cohort",
-  priorObservation = 365,
-  gapEra = 30,
-  priorUseWashout = 365,
-  limit = "first",
-  cohortDateRange = as.Date(c("2010-01-01", "2021-12-31")),
-  imputeDuration = "none"
-)
-info(logger, "export new users cohort")
-newUserCohorts <- cohortSet(cdm$new_users_cohort) %>%
-  inner_join(cohortAttrition(cdm$new_users_cohort), by = "cohort_definition_id") %>%
-  addCdmName(cdm) %>%
-  mutate(table_name = attr(cdm$new_users_cohort, "table_name"))
-write_csv(newUserCohorts, here(resultsFolder, paste0("newUsersCohort_",
-                                                     databaseAcronym,
-                                                     ".csv")))
-
-info(logger, "NEW USER COHORTS CREATED")
+printLog(logger, "Create new users cohorts")
+cdm[[newUsersCohort]] <- cdm[[prevalentCohort]] |>
+  dplyr::compute(name = newUsersCohort, temporary = FALSE) |>
+  omopgenerics::newCohortTable(
+    cohortSetRef = omopgenerics::settings(cdm[[prevalentCohort]]) |>
+      dplyr::mutate(cohort_name = "new_user_simvastatin")
+  ) |>
+  DrugUtilisation::requirePriorDrugWashout(days = 365) |>
+  DrugUtilisation::requireObservationBeforeDrug(days = 365) |>
+  DrugUtilisation::requireDrugInDateRange(dateRange = studyPeriod) |>
+  DrugUtilisation::requireIsFirstDrugEntry()
+countsNewUsers <- cdm[[newUsersCohort]] |>
+  CohortCharacteristics::summariseCohortCount()
+attritionNewUsers <- cdm[[newUsersCohort]] |>
+  CohortCharacteristics::summariseCohortAttrition()
+printLog(logger, "New users cohorts created", "v")
 
 # add sex and ageGroup to stratify latter ----
-info(logger, "add age and sex")
-cdm$new_users_cohort <- cdm$new_users_cohort %>%
-  addSex() %>%
-  addAge(ageGroup = ageGroup)
+printLog(logger, "Add stratification variables")
+cdm[[newUsersCohort]] <- cdm[[newUsersCohort]] |>
+  PatientProfiles::addDemographics(
+    sex = TRUE,
+    age = FALSE,
+    ageGroup = ageGroup,
+    priorObservation = FALSE,
+    futureObservation = FALSE,
+    dateOfBirth = FALSE
+  )
+printLog(logger, "Stratification variables added", "v")
 
-# subset the cdm ----
-info(logger, "subset cdm")
-cdm <- cdmSubsetCohort(cdm, "new_users_cohort")
-cdm$drug_exposure <- cdm$drug_exposure %>% computeQuery()
-cdm$condition_occurrence <- cdm$condition_occurrence %>% computeQuery()
-cdm$observation <- cdm$observation %>% computeQuery()
+# instantiate characterisation cohorts  ----
+printLog(logger, "Instantiate characterisation cohorts")
+cdm[[conditionsCohort]] <- CohortConstructor::conceptCohort(
+  cdm = cdm,
+  conceptSet = conditions,
+  name = conditionsCohort,
+  exit = "event_start_date"
+  # TO DO issue 400 in CC
+  # subsetCohort = newUsersCohort
+)
+cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(
+  cdm = cdm,
+  name = medicationsCohort,
+  conceptSet = medications,
+  subsetCohort = newUsersCohort
+)
+printLog(logger, "Characterisation cohorts instantiated", "v")
 
 # summarise characteristics ----
-info(logger, "SUMMARISE CHARACTERISTICS")
-# instantiate conditions cohorts
-info(logger, "instantiate conditions")
-cdm <- generateConceptCohortSet(
-  cdm = cdm,
-  conceptSet = codesFromConceptSet(path = here("ConceptSets", "Conditions"), cdm = cdm),
-  name = "conditions",
-  end = "event_end_date"
-)
-# instantiate medication cohorts
-info(logger, "instantiate medications")
-cdm <- generateConceptCohortSet(
-  cdm = cdm,
-  conceptSet = codesFromConceptSet(path = here("ConceptSets", "Medications"), cdm = cdm),
-  name = "medications",
-  end = "event_end_date"
-)
-# summarise characteristics
-info(logger, "summarise characteristics")
-characteristics <- summariseCharacteristics(
-  cohort = cdm$new_users_cohort,
+printLog(logger, "Summarise new users characteristics")
+characteristics <- CohortCharacteristics::summariseCharacteristics(
+  cohort = cdm[[newUsersCohort]],
   strata = strata,
   ageGroup = ageGroup,
   tableIntersectCount = list("Visits in prior year" = list(
@@ -178,154 +160,198 @@ characteristics <- summariseCharacteristics(
   )),
   cohortIntersectFlag = list(
     "Conditions any time prior" = list(
-      targetCohortTable = "conditions", window = c(-Inf, -1)
+      targetCohortTable = conditionsCohort, window = c(-Inf, -1)
     ),
     "Medications prior year" = list(
-      targetCohortTable = "medications",  window = c(-365, -1)
+      targetCohortTable = medicationsCohort,  window = c(-365, -1)
     )
   )
 )
-characteristics %>%
-  exportSummarisedResult(fileName = here(resultsFolder,
-                                         paste0("characteristics_",
-                                                databaseAcronym,
-                                                ".csv")))
-info(logger, "CHARACTERISTICS SUMMARISED")
+printLog(logger, "New users characteristics summarised", "v")
 
 # summarise indication ----
-info(logger, "SUMMARISE INDICATION")
-# instantate indication cohorts
-cdm <- generateConceptCohortSet(
+printLog(logger, "Instantiate indications cohorts")
+cdm[[indicationCohort]] <- CohortConstructor::conceptCohort(
   cdm = cdm,
-  conceptSet = codesFromConceptSet(here("ConceptSets", "Indication"), cdm = cdm),
-  name = "indication",
-  limit = "all",
-  end = "event_end_date"
+  conceptSet = indications,
+  name = indicationCohort,
+  exit = "event_start_date"
+  #subsetCohort = newUsersCohort
 )
-# summarise indications
-summaryIndication <- cdm$new_users_cohort %>%
-  addIndication(
-    indicationCohortName = "indication",
-    indicationWindow = list(c(0, 0), c(-30, 0), c(-180, 0), c(-Inf, 0)),
-    unknownIndicationTable = c("observation", "condition_occurrence")
-  ) %>%
-  summariseIndication(indicationCohortName = "indication",
-                      strata = strata)
-summaryIndication %>%
-  exportSummarisedResult(fileName = here(resultsFolder,
-                                         paste0("indication_",
-                                           databaseAcronym,
-                                           ".csv")))
-info(logger, "INDICATION SUMMARISED")
+printLog(logger, "Indications cohorts instantiated", "v")
 
-# summarise drug use ----
-info(logger, "SUMMARISE DRUG USE")
-info(logger, "get the ingredient concept id")
-ingredientConceptId <- cdm[["concept"]] %>%
-  filter(.data$concept_name == .env$ingredient) %>%
-  filter(.data$concept_class_id == "Ingredient") %>%
-  filter(.data$standard_concept == "S") %>%
-  pull("concept_id")
-
-info(logger, "add drug use data")
-drugUse <- cdm$new_users_cohort %>%
-  summariseDrugUtilisation(strata = strata,
-                           conceptSet = conceptSet,
-                           ingredientConceptId = ingredientConceptId)
-drugUse %>%
-  exportSummarisedResult(fileName = here(resultsFolder,
-                                         paste0("drugUse_",
-                                           databaseAcronym,
-                                           ".csv")))
-
-
-info(logger, "DRUG USE SUMMARISED")
-
-# # summarise large scale characteristics ----
-# info(logger, "START LARGE SCALE CHARACTERISTICS")
-# lsc <- summariseLargeScaleCharacteristics(
-#   cohort = cdm$new_users_cohort,
-#   strata = strata,
-#   eventInWindow = c("condition_occurrence"),#, "ICD10 Sub-chapter"),
-#   episodeInWindow = c("drug_exposure")#, "ATC 3rd")
-# )
-# info(logger, "export large scale characteristics")
-# write_csv(lsc, here(resultsFolder, "largeScaleCharacteristics.csv"))
-# info(logger, "LARGE SCALE CHARACTERISTICS FINISHED")
-
-# summarise treatment discontinuation ----
-info(logger, "TREATMENT DISCONTINUATION")
-
-ppcSummary <- cdm$new_users_cohort |>
-  summariseProportionOfPatientsCovered(followUpDays = 90,
-                                       strata = strata)
-
-# discontinuation <- cdm$new_users_cohort %>%
-#   treatmentDiscontinuation(strata = strata)
-info(logger, "export treatment discontinuation")
-ppcSummary %>%
-  exportSummarisedResult(fileName = here(resultsFolder,
-                                         paste0("ppcSummary_",
-                                           databaseAcronym,
-                                           ".csv")))
-info(logger, "TREATMENT DISCONTINUATION FINISHED")
-
-# summarise treatments patterns ----
-info(logger, "SUMMARISE TREATMENTS")
-info(logger, "get drug codelists")
-codelist <- getDrugIngredientCodes(cdm = cdm, name = c(alternativeIngredients, ingredient))
-names(codelist) <- gsub("Ingredient: ", "", names(codelist)) %>%
-  strsplit(" ") %>%
-  lapply(function(x) {x[1]}) %>%
-  unlist()
-info(logger, "summarise treatments")
-cdm <- generateDrugUtilisationCohortSet(
-  cdm = cdm,
-  conceptSet = codelist,
-  name = "new_users_cohort_alt",
-  priorObservation = 365,
-  gapEra = 30,
-  priorUseWashout = 365,
-  limit = "first",
-  cohortDateRange = as.Date(c("2010-01-01", "2021-12-31")),
-  imputeDuration = "none"
-)
-
-alternativeTreatments <- cdm$new_users_cohort %>%
-  summariseTreatment(
+printLog(logger, "Summarise indications")
+indication <- cdm[[newUsersCohort]] |>
+  DrugUtilisation::summariseIndication(
     strata = strata,
-    window = list(c(0, 0), c(1, 30), c(31, 90), c(91, 180), c(181, 365)),
-    treatmentCohortName = "new_users_cohort_alt",
+    indicationCohortName = indicationCohort,
+    indicationWindow = list(c(0, 0), c(-30, 0), c(-180, 0), c(-Inf, 0)),
+    unknownIndicationTable = c("observation", "condition_occurrence"),
+    mutuallyExclusive = FALSE
   )
+printLog(logger, "Indications summarised", "v")
 
+# summarise drug utilisation ----
+printLog(logger, "Summarise drug utilisation")
+drugUtilisation <- cdm[[newUsersCohort]] |>
+  DrugUtilisation::summariseDrugUtilisation(
+    strata = strata,
+    conceptSet = simvastatin,
+    ingredientConceptId = ingredientConceptId,
+    indexDate = "cohort_start_date",
+    censorDate = "cohort_end_date",
+    restrictIncident = TRUE,
+    gapEra = 30,
+    estimates = c(
+      "count", "percentage", "count_missing", "percentage_missing", "min",
+      "q25", "median", "q75", "max", "density"
+    )
+  )
+printLog(logger, "Drug utilisation summarised", "v")
 
-info(logger, "export treatment summary")
-alternativeTreatments %>%
-  exportSummarisedResult(fileName = here(resultsFolder,
-                                         paste0("treatmentSummary_",
-                                           databaseAcronym,
-                                           ".csv")))
+# new users with future prescriptions ----
+cdm[[newUsersWithFuturePrescriptions]] <-  cdm[[newUsersCohort]] |>
+  dplyr::select("subject_id", "start_date" = "cohort_start_date", "age_group", "sex") |>
+  dplyr::inner_join(cdm[[prevalentCohort]], by = c("subject_id")) |>
+  dplyr::filter(.data$cohort_start_date >= .data$start_date) |>
+  dplyr::select(!"start_date") |>
+  dplyr::compute(name = newUsersWithFuturePrescriptions, temporary = FALSE) |>
+  omopgenerics::newCohortTable()
 
-info(logger, "TREATMENTS SUMMARISED")
+# summarise proportion of patients covered ----
+printLog(logger, "Summarise PPC")
+ppc <- cdm[[newUsersWithFuturePrescriptions]] |>
+  DrugUtilisation::summariseProportionOfPatientsCovered(
+    strata = strata,
+    followUpDays = 365
+  )
+printLog(logger, "PPC summarised", "v")
+
+# instantiate alternative ingredients ----
+printLog(logger, "Instantiate alternative ingredients cohorts")
+cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(
+  cdm = cdm,
+  conceptSet = alternativeIngredients,
+  name = alternativeCohort,
+  subsetCohort = newUsersCohort
+)
+printLog(logger, "Alternative ingredients cohorts instantiated", "v")
+
+# summarise comedications before start ----
+printLog(logger, "Summarise comedications")
+comedications <- cdm[[newUsersCohort]] |>
+  DrugUtilisation::summariseTreatment(
+    window = list(
+      c(-360, -271), c(-270, -181), c(-180, -91), c(-90, -1), c(0, 0), c(1, 90),
+      c(91, 180), c(181, 270), c(271, 360)
+    ),
+    treatmentCohortName = alternativeCohort,
+    strata = strata,
+    indexDate = "cohort_start_date",
+    censorDate = "cohort_end_date",
+    mutuallyExclusive = FALSE
+  )
+comedications <- comedications |>
+  omopgenerics::newSummarisedResult(
+    settings = omopgenerics::settings(comedications) |>
+      dplyr::mutate(index_date = "cohort_start_date")
+  )
+printLog(logger, "Comedications summarised", "v")
 
 # drug restart ----
-drugRestart <- cdm$new_users_cohort |>
-  summariseDrugRestart(switchCohortTable = "new_users_cohort_alt",
-                       strata = strata,
-                       switchCohortId = c(1:4, 6:11), followUpDays = c(100, 300, Inf))
+printLog(logger, "Summarise drug restart")
+drugRestart <- cdm[[newUsersWithFuturePrescriptions]] |>
+  DrugUtilisation::summariseDrugRestart(
+    switchCohortTable = alternativeCohort,
+    strata = strata,
+    followUpDays = c(90, 180, 270, 360),
+    restrictToFirstDiscontinuation = TRUE,
+    incident = FALSE
+  )
+printLog(logger, "Drug restart summarised", "v")
 
-drugRestart %>%
-  exportSummarisedResult(fileName = here(resultsFolder, paste0("drugRestart_",
-                                           databaseAcronym,
-                                           ".csv")))
+# summarise medications after end ----
+printLog(logger, "Summarise medications after discontinuation")
+cdm <- omopgenerics::bind(cdm[[prevalentCohort]], cdm[[alternativeCohort]], name = alternativeCohort)
+switchMedications <- cdm[[newUsersCohort]] |>
+  DrugUtilisation::summariseTreatment(
+    window = list(c(-90, -1), c(0, 0), c(1, 90), c(91, 180), c(181, 270), c(271, 360)),
+    treatmentCohortName = alternativeCohort,
+    strata = strata,
+    indexDate = "cohort_end_date",
+    censorDate = NULL,
+    mutuallyExclusive = FALSE
+  )
+switchMedications <- switchMedications |>
+  omopgenerics::newSummarisedResult(
+    settings = omopgenerics::settings(switchMedications) |>
+      dplyr::mutate(index_date = "cohort_end_date")
+  )
+printLog(logger, "Medications after discontinuation summarised", "v")
 
-# create zip file ----
-info(logger, "EXPORT RESULTS")
-zip(
-  zipfile = here(resultsFolder, "Results.zip"),
-  files = list.files(resultsFolder),
+# exporting results ----
+printLog(logger, "Exporting results")
+omopgenerics::exportSummarisedResult(
+  snapshot,
+  countsPrevalent,
+  attritionPrevalent,
+  countsDenominator,
+  attritionDenominator,
+  prevalence,
+  incidence,
+  countsNewUsers,
+  attritionNewUsers,
+  characteristics,
+  indication,
+  drugUtilisation,
+  ppc,
+  comedications,
+  drugRestart,
+  switchMedications,
+  minCellCount = minCellCount,
+  fileName = "drug_utilisation_article_{cdm_name}_{date}.csv",
+  path = resultsFolder
+)
+zip::zip(
+  zipfile = here::here(
+    resultsFolder, paste0("Results_", omopgenerics::cdmName(cdm), ".zip")
+  ),
+  files = list.files(resultsFolder, pattern = ".csv|.txt"),
   root = resultsFolder
 )
+printLog(logger, "Results exported", "v")
+
+cli::cli_inform(c("v" = "Study fnished"))
+cli::cli_inform(c("i" = "Please see the csv exported, the log file and the zipped results containing both."))
 
 # drop the permanent tables created during the analysis ----
-# dropTable(cdm, everything(), TRUE)
+dropAllTables <- function() {
+  answer <- "2"
+  if (rlang::is_interactive()) {
+    cli::cli_inform(c(
+      "!" = "Do you want to drop tables cretaed during the study?. Enter choice 1 or 2:",
+      " " = "1) Delete tables",
+      " " = "2) Keep tables"
+    ))
+    answer <- readline()
+    while (!answer %in% c("1", "2")) {
+      cli::cli_inform(c("x" = "Invalid input. Please choose 1 to delete or 2 to keep them:"))
+      answer <- readline()
+    }
+  }
+  if (answer == "1") {
+    tables <- omopgenerics::listSourceTables(cdm = cdm)
+    cli::cli_inform(c("!" = "The following tables will be deleted: {.pkg {tables}}. Can you confirm?", " " = "1) YES", " " = "2) NO"))
+    answer <- readline()
+    while (!answer %in% c("1", "2")) {
+      cli::cli_inform(c("x" = "Invalid input. Please choose 1 to confirm or 2 to cancel:"))
+      answer <- readline()
+    }
+    if (answer == "1") {
+      cli::cli_inform(c("i" = "Deleting tables"))
+      omopgenerics::dropSourceTable(cdm = cdm, name = tables)
+    }
+  }
+  invisible()
+}
+dropAllTables()
