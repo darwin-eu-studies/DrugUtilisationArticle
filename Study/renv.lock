@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.3",
+    "Version": "4.2.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -11,9 +11,16 @@
   "Packages": {
     "CDMConnector": {
       "Package": "CDMConnector",
-      "Version": "1.7.0",
+      "Version": "2.0.0",
       "Source": "Repository",
       "Repository": "RSPM",
+      "RemoteType": "standard",
+      "RemotePkgRef": "CDMConnector",
+      "RemoteRef": "CDMConnector",
+      "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
+      "RemoteReposName": "CRAN",
+      "RemotePkgPlatform": "x86_64-w64-mingw32",
+      "RemoteSha": "2.0.0",
       "Requirements": [
         "DBI",
         "R",
@@ -36,19 +43,18 @@
         "tidyselect",
         "withr"
       ],
-      "Hash": "5233515358b0c45cd01e0d19573f0709"
+      "Hash": "5474640ec50d28c7e05304354f51d0a8"
     },
     "CodelistGenerator": {
       "Package": "CodelistGenerator",
       "Version": "3.3.1",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "RemoteType": "standard",
       "RemotePkgRef": "CodelistGenerator",
       "RemoteRef": "CodelistGenerator",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
+      "RemoteRepos": "https://cloud.r-project.org",
+      "RemotePkgPlatform": "aarch64-apple-darwin20",
       "RemoteSha": "3.3.1",
       "Requirements": [
         "DBI",
@@ -73,15 +79,9 @@
     },
     "CohortCharacteristics": {
       "Package": "CohortCharacteristics",
-      "Version": "0.4.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "RemoteType": "standard",
-      "RemotePkgRef": "CohortCharacteristics",
-      "RemoteRef": "CohortCharacteristics",
-      "RemoteRepos": "https://cloud.r-project.org",
-      "RemotePkgPlatform": "aarch64-apple-darwin20",
-      "RemoteSha": "0.4.0",
       "Requirements": [
         "CDMConnector",
         "PatientProfiles",
@@ -94,16 +94,22 @@
         "rlang",
         "snakecase",
         "stringr",
-        "tidyr",
-        "visOmopResults"
+        "tidyr"
       ],
-      "Hash": "d729272fbcce172fe82007b6fd6b6060"
+      "Hash": "3bc1ee265ebb4a08f8067a10df0ab5a3"
     },
     "CohortConstructor": {
       "Package": "CohortConstructor",
-      "Version": "0.3.4",
+      "Version": "0.3.5",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
+      "RemoteType": "standard",
+      "RemotePkgRef": "CohortConstructor",
+      "RemoteRef": "CohortConstructor",
+      "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
+      "RemoteReposName": "CRAN",
+      "RemotePkgPlatform": "x86_64-w64-mingw32",
+      "RemoteSha": "0.3.5",
       "Requirements": [
         "CDMConnector",
         "PatientProfiles",
@@ -121,7 +127,7 @@
         "tidyr",
         "utils"
       ],
-      "Hash": "8bd2c31a410f644d2a7c10219d6a9734"
+      "Hash": "ded82632abd9d52a804568132a123324"
     },
     "DBI": {
       "Package": "DBI",
@@ -136,9 +142,9 @@
     },
     "DrugUtilisation": {
       "Package": "DrugUtilisation",
-      "Version": "0.8.2",
+      "Version": "0.8.3",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
         "CDMConnector",
         "CodelistGenerator",
@@ -155,13 +161,13 @@
         "stringr",
         "tidyr"
       ],
-      "Hash": "95cc2f1cdb68b21ece3df472d33d887f"
+      "Hash": "1d0e68b4e91e7e18c2de5b97bf764d09"
     },
     "IncidencePrevalence": {
       "Package": "IncidencePrevalence",
-      "Version": "1.0.0",
+      "Version": "1.2.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "CDMConnector",
         "PatientProfiles",
@@ -177,13 +183,13 @@
         "stringr",
         "tidyr"
       ],
-      "Hash": "27f8a09bfe99508356f64a430a590fae"
+      "Hash": "a47d4f7cda354c36bfdc3d3f9dce5ceb"
     },
     "OmopSketch": {
       "Package": "OmopSketch",
-      "Version": "0.2.1",
+      "Version": "0.3.1",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "CDMConnector",
         "CohortConstructor",
@@ -201,20 +207,20 @@
         "tibble",
         "tidyr"
       ],
-      "Hash": "1267f40708ddba6cd56b623d5c386ad3"
+      "Hash": "2a90d43f790e0aebbc9504251b0a8a0f"
     },
     "PatientProfiles": {
       "Package": "PatientProfiles",
-      "Version": "1.2.3",
+      "Version": "1.3.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "RemoteType": "standard",
       "RemotePkgRef": "PatientProfiles",
       "RemoteRef": "PatientProfiles",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+      "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
       "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "1.2.3",
+      "RemotePkgPlatform": "x86_64-w64-mingw32",
+      "RemoteSha": "1.3.1",
       "Requirements": [
         "CDMConnector",
         "R",
@@ -227,7 +233,7 @@
         "stringr",
         "tidyr"
       ],
-      "Hash": "4f2cb7324f2d1d4f04a4aeb52fc6a200"
+      "Hash": "fb34f923ae556579d767d25ea2f4ceb3"
     },
     "R6": {
       "Package": "R6",
@@ -241,51 +247,13 @@
     },
     "RJSONIO": {
       "Package": "RJSONIO",
-      "Version": "1.3-1.8",
+      "Version": "1.3-1.9",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "methods"
       ],
-      "Hash": "cd79d1874fb20217463451f8c310c526"
-    },
-    "RPostgres": {
-      "Package": "RPostgres",
-      "Version": "1.4.7",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "DBI",
-        "R",
-        "bit64",
-        "blob",
-        "cpp11",
-        "hms",
-        "lubridate",
-        "methods",
-        "plogr",
-        "withr"
-      ],
-      "Hash": "beb7e18bf3f9e096f716a52a77ec793c"
-    },
-    "SqlRender": {
-      "Package": "SqlRender",
-      "Version": "1.19.1",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "SqlRender",
-      "RemoteRef": "SqlRender",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "1.19.1",
-      "Requirements": [
-        "checkmate",
-        "rJava",
-        "rlang"
-      ],
-      "Hash": "724f42bc6933a7fd3918d2fb087c4eb2"
+      "Hash": "2f89abc0f88c647d3386c672632f4baf"
     },
     "backports": {
       "Package": "backports",
@@ -299,28 +267,27 @@
     },
     "bit": {
       "Package": "bit",
-      "Version": "4.5.0.1",
+      "Version": "4.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "f89f074e0e49bf1dbe3eba0a15a91476"
+      "Hash": "5dc7b2677d65d0e874fc4aaf0e879987"
     },
     "bit64": {
       "Package": "bit64",
-      "Version": "4.6.0-1",
+      "Version": "4.5.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "bit",
-        "graphics",
         "methods",
         "stats",
         "utils"
       ],
-      "Hash": "4f572fbc586294afff277db583b9060f"
+      "Hash": "e84984bf5f12a18628d9a02322128dfd"
     },
     "blob": {
       "Package": "blob",
@@ -338,14 +305,7 @@
       "Package": "checkmate",
       "Version": "2.3.2",
       "Source": "Repository",
-      "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "checkmate",
-      "RemoteRef": "checkmate",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "2.3.2",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "backports",
@@ -376,7 +336,7 @@
     },
     "clock": {
       "Package": "clock",
-      "Version": "0.7.2",
+      "Version": "0.7.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -388,17 +348,17 @@
         "tzdb",
         "vctrs"
       ],
-      "Hash": "64780087d11447eb617fc566f26bee15"
+      "Hash": "3dcaebd52554438d12989e5061e15de8"
     },
     "cpp11": {
       "Package": "cpp11",
-      "Version": "0.5.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "9df43854f1c84685d095ed6270b52387"
+      "Hash": "91570bba75d0c9d3f1040c835cee8fba"
     },
     "crayon": {
       "Package": "crayon",
@@ -490,14 +450,7 @@
       "Package": "glue",
       "Version": "1.8.0",
       "Source": "Repository",
-      "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "glue",
-      "RemoteRef": "glue",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "1.8.0",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "methods"
@@ -532,14 +485,7 @@
       "Package": "jsonlite",
       "Version": "1.8.9",
       "Source": "Repository",
-      "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "jsonlite",
-      "RemoteRef": "jsonlite",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "1.8.9",
+      "Repository": "CRAN",
       "Requirements": [
         "methods"
       ],
@@ -567,7 +513,7 @@
     },
     "lubridate": {
       "Package": "lubridate",
-      "Version": "1.9.2",
+      "Version": "1.9.3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -576,7 +522,7 @@
         "methods",
         "timechange"
       ],
-      "Hash": "e25f18436e3efd42c7c590a1c4c15390"
+      "Hash": "680ad542fbcf801442c83a6ac5a2126c"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -590,16 +536,9 @@
     },
     "omopgenerics": {
       "Package": "omopgenerics",
-      "Version": "0.4.1",
+      "Version": "1.1.1",
       "Source": "Repository",
       "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "omopgenerics",
-      "RemoteRef": "omopgenerics",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "0.4.1",
       "Requirements": [
         "R",
         "cli",
@@ -612,19 +551,21 @@
         "purrr",
         "rlang",
         "snakecase",
+        "stringi",
         "stringr",
         "tidyr",
         "vctrs"
       ],
-      "Hash": "072f4e363174ababd20aeab7926d5797"
+      "Hash": "3f367d7284e986f85ff6a4e8d57d49e2"
     },
     "pillar": {
       "Package": "pillar",
-      "Version": "1.10.1",
+      "Version": "1.9.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "cli",
+        "fansi",
         "glue",
         "lifecycle",
         "rlang",
@@ -632,7 +573,7 @@
         "utils",
         "vctrs"
       ],
-      "Hash": "8b16b6097daef84cd3c40a6a7c5c9d86"
+      "Hash": "15da5a8412f317beeee6175fbc76f4bb"
     },
     "pkgconfig": {
       "Package": "pkgconfig",
@@ -643,13 +584,6 @@
         "utils"
       ],
       "Hash": "01f28d4278f15c76cddbea05899c5d6f"
-    },
-    "plogr": {
-      "Package": "plogr",
-      "Version": "0.2.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "09eb987710984fc2905c7129c7d85e65"
     },
     "prettyunits": {
       "Package": "prettyunits",
@@ -690,17 +624,6 @@
       ],
       "Hash": "1cba04a4e9414bdefc9dcaa99649a8dc"
     },
-    "rJava": {
-      "Package": "rJava",
-      "Version": "1.0-11",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "methods"
-      ],
-      "Hash": "524167e771b81342f8dd7a891ed3afa8"
-    },
     "readr": {
       "Package": "readr",
       "Version": "2.1.5",
@@ -736,24 +659,24 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "1.1.5",
+      "Version": "1.1.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "724dcc1490cd7071ee75ca2994a5446e"
+      "Hash": "3eec01f8b1dee337674b2e34ab1f9bc1"
     },
     "rprojroot": {
       "Package": "rprojroot",
-      "Version": "2.0.3",
+      "Version": "2.0.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "1de7ab598047a87bba48434ba35d497d"
+      "Hash": "4c8415e0ec1e29f3f4f6fc108bef0144"
     },
     "snakecase": {
       "Package": "snakecase",
@@ -857,14 +780,14 @@
     },
     "timechange": {
       "Package": "timechange",
-      "Version": "0.2.0",
+      "Version": "0.3.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "cpp11"
       ],
-      "Hash": "8548b44f79a35ba1791308b61e6012d7"
+      "Hash": "c5f3c201b931cd6474d17d8700ccb1c8"
     },
     "tzdb": {
       "Package": "tzdb",
@@ -903,10 +826,11 @@
     },
     "visOmopResults": {
       "Package": "visOmopResults",
-      "Version": "1.0.0",
+      "Version": "1.0.2",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Requirements": [
+        "R",
         "cli",
         "dplyr",
         "generics",
@@ -917,7 +841,7 @@
         "stringr",
         "tidyr"
       ],
-      "Hash": "4a6d832d0cf4775f7a3f865982b92231"
+      "Hash": "d96d7b20f74dae92ee78f05b0624c7b3"
     },
     "vroom": {
       "Package": "vroom",
@@ -947,29 +871,22 @@
     },
     "withr": {
       "Package": "withr",
-      "Version": "3.0.2",
+      "Version": "3.0.1",
       "Source": "Repository",
-      "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "withr",
-      "RemoteRef": "withr",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "source",
-      "RemoteSha": "3.0.2",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "grDevices",
         "graphics"
       ],
-      "Hash": "cc2d62c76458d425210d1eb1478b30b4"
+      "Hash": "07909200e8bbe90426fbfeb73e1e27aa"
     },
     "zip": {
       "Package": "zip",
-      "Version": "2.3.0",
+      "Version": "2.3.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "d98c94dacb7e0efcf83b0a133a705504"
+      "Hash": "fcc4bd8e6da2d2011eb64a5e5cc685ab"
     }
   }
 }
