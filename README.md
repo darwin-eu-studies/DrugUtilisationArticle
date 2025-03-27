@@ -1,3 +1,5 @@
 # DrugUtilisationArticle
-To run the study please follow Codetorun instratcions
+
+To run the study please follow CodeToRun.R instratcions in Study folder.
+
 Results: [https://dpa-pde-oxford.shinyapps.io/DrugUtilisation/]
