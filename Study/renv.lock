@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.1",
+    "Version": "4.2.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -49,13 +49,7 @@
       "Package": "CodelistGenerator",
       "Version": "3.3.1",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "RemoteType": "standard",
-      "RemotePkgRef": "CodelistGenerator",
-      "RemoteRef": "CodelistGenerator",
-      "RemoteRepos": "https://cloud.r-project.org",
-      "RemotePkgPlatform": "aarch64-apple-darwin20",
-      "RemoteSha": "3.3.1",
+      "Repository": "RSPM",
       "Requirements": [
         "DBI",
         "PatientProfiles",
@@ -142,7 +136,7 @@
     },
     "DrugUtilisation": {
       "Package": "DrugUtilisation",
-      "Version": "0.8.3",
+      "Version": "1.0.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -154,14 +148,13 @@
         "clock",
         "dplyr",
         "glue",
-        "lifecycle",
         "omopgenerics",
         "purrr",
         "rlang",
         "stringr",
         "tidyr"
       ],
-      "Hash": "1d0e68b4e91e7e18c2de5b97bf764d09"
+      "Hash": "30a2e8c33dc9468bca8e906642c4ea62"
     },
     "IncidencePrevalence": {
       "Package": "IncidencePrevalence",
@@ -214,13 +207,6 @@
       "Version": "1.3.1",
       "Source": "Repository",
       "Repository": "RSPM",
-      "RemoteType": "standard",
-      "RemotePkgRef": "PatientProfiles",
-      "RemoteRef": "PatientProfiles",
-      "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-      "RemoteReposName": "CRAN",
-      "RemotePkgPlatform": "x86_64-w64-mingw32",
-      "RemoteSha": "1.3.1",
       "Requirements": [
         "CDMConnector",
         "R",

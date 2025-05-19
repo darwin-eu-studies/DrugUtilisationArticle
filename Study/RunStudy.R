@@ -50,6 +50,14 @@ printLog(logger, "Extracting cdm snapshot")
 snapshot <- OmopSketch::summariseOmopSnapshot(cdm)
 printLog(logger, "cdm snapshot done", "v")
 
+# benchmarking ----
+bm  <- DrugUtilisation::benchmarkDrugUtilisation(
+  cdm,
+  ingredient = "simvastatin",
+  alternativeIngredient = names(alternativeIngredients),
+  indicationCohort = NULL
+)
+
 # create prevalent user cohorts ----
 printLog(logger, "Create prevalent users cohorts")
 cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(
@@ -293,6 +301,7 @@ printLog(logger, "Medications after discontinuation summarised", "v")
 printLog(logger, "Exporting results")
 omopgenerics::exportSummarisedResult(
   snapshot,
+  bm,
   countsPrevalent,
   attritionPrevalent,
   countsDenominator,
