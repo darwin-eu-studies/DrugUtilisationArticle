@@ -213,7 +213,7 @@ ggplot2::ggplot() +
 p
 
 ggplot2::ggsave(
-  filename = "./Figures/Diagram6.png",
+  filename = "./Figures/Diagram3.png",
   plot = p,
   width = 974*3,
   height = 426*3,
