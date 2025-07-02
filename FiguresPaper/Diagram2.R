@@ -13,7 +13,7 @@ exposures <- dplyr::tibble(
 )
 headache <- dplyr::tibble(
   person_id = c(4, 2),
-  x = c(3, -35)
+  x = c(3, -32)
 )
 pain <- dplyr::tibble(
   person_id = c(2, 4, 5),
@@ -21,7 +21,7 @@ pain <- dplyr::tibble(
 )
 unknown <- dplyr::tibble(
   person_id = c(2, 3, 3, 4, 5),
-  x = c(-15, -10, -20, -40, 20)
+  x = c(-15, -10, -20, -36, 20)
 )
 
 headache <- headache |>
@@ -101,6 +101,22 @@ p <- ggplot2::ggplot() +
     stroke = 0.3,
     colour = "black",
     inherit.aes = FALSE
+  ) +
+  # persons
+  ggimage::geom_image(
+    mapping = ggplot2::aes(x = -40, y = 1:5, image = "./person.png"),
+    data = dplyr::tibble(),
+    inherit.aes = FALSE,
+    size = 0.15
+  ) +
+  ggplot2::geom_text(
+    mapping = ggplot2::aes(x = -40, y = 1:5, label = 1:5),
+    data = dplyr::tibble(),
+    inherit.aes = FALSE,
+    color = "white",
+    nudge_y = 0.08,
+    size = 3.5,
+    family = "Graphik"
   ) +
   # legend
   ggplot2::scale_color_manual(
