@@ -115,8 +115,15 @@ plotDrugUtilisation(
 ```{r}
 df_ind <- data$summarise_indication |>
   filterStrata(sex == "overall") |>
-  filter(variable_name == "Indication on index date")
+  filter(variable_name == "Indication from 30 days before to the index date")
 
 plotIndication(df_ind, facet = cdm_name~age_group)+
   theme(text = element_text(size = 16))
+```
+
+```{r}
+ppc<-data$summarise_proportion_of_patients_covered |>
+  filterStrata(age_group != "overall", !age_group %in% c("None", "overall"))
+plotProportionOfPatientsCovered(ppc, facet = cdm_name~ sex, colour = "age_group")+
+  theme(text=element_text(size=16))
 ```
