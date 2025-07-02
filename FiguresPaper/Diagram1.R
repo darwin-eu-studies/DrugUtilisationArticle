@@ -8,19 +8,19 @@ x0 <- dplyr::tibble(start = c(0, 5, 24), end = c(11, 14, 30), y = c(5, 4, 4.5)) 
 x1 <- dplyr::tibble(xmin = c(0, 24, 0), xmax = c(14, 30, 30), y = c(1.3, 1.3, 0)) |>
   dplyr::mutate(group = dplyr::row_number())
 x2 <- dplyr::tibble(x = c(14, 24), y = c(4.5, 5.5))
+x0$type <- "Exposures"
+x1$type <- "Eras"
 
 p <- ggplot2::ggplot() +
   ggplot2::geom_line(
-    mapping = ggplot2::aes(x = x, y = y, group = group),
+    mapping = ggplot2::aes(x = x, y = y, group = group, color = type),
     data = x0,
     size = 2,
-    colour = exposures
   ) +
   ggplot2::geom_errorbar(
-    mapping = ggplot2::aes(xmax = xmax, xmin = xmin, y = y, group = group),
+    mapping = ggplot2::aes(xmax = xmax, xmin = xmin, y = y, group = group, color = type),
     data = x1,
     size = 0.7,
-    colour = era,
     width = 0.4
   ) +
   ggplot2::geom_segment(
@@ -71,12 +71,17 @@ p <- ggplot2::ggplot() +
     mapping = ggplot2::aes(x = c(14, 14, 24, 24), y = c(4, 5.7, 4.5, 5.7), group = c(1, 1, 2, 2)),
     linetype = "dashed"
   ) +
+  ggplot2::scale_color_manual(
+    name = NULL,
+    values = c("Exposures" = exposures, "Eras" = era)
+  ) +
   ggbrace::stat_brace(mapping = aes(x = x, y = y), data = x2) +
   ggplot2::xlim(c(-8, 35)) +
   ggplot2::ylim(c(-2, 7)) +
-  #ggplot2::theme_void() +
+  ggplot2::theme_void() +
   ggplot2::theme(
     legend.position = "top",
+    legend.text = ggplot2::element_text(size = 14),
     plot.background = ggplot2::element_rect(fill = "white", color = NA),
     panel.background = ggplot2::element_rect(fill = "white", color = NA)
   )
