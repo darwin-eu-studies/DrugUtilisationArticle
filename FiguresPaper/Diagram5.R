@@ -1,5 +1,6 @@
 
-colour <- "#66A3FF"
+cole <- "#66A3FF"
+colp <- "#003366"
 
 eras <- dplyr::tibble(
   person_id = c(1L, 1L, 2L, 3L, 4L, 4L, 5L),
@@ -74,25 +75,21 @@ notObs <- obs |>
     y = person_y(person_id)
   ) |>
   tidyr::pivot_longer(c("start", "end"), names_to = NULL, values_to = "x")
-l0 <- 80
-w <- 25
+l0 <- 30
+w1 <- 25
 s1 <- 3
-s2 <- 62
-leg0 <- dplyr::tibble(x = l0 + c(w + s1, 2 * w + 2 * s1 + s2), y = 2.3, lab = c("Exposed", "Not in observation"))
+s2 <- 57
+s3 <- 107
+leg0 <- dplyr::tibble(x = l0 + c(w + s1, 2 * w + 2 * s1 + s2, 3 * w + 3 * s1 + s2 + s3), y = 2.3, lab = c("Exposed", "Not in observation", "PPC (95%CI)"))
 leg1 <- dplyr::tibble(x = c(0, w) + l0, y = 2.3)
 leg2 <- dplyr::tibble(x = c(0, w) + l0 + s2 + w + s1, y = 2.3)
+leg3 <- dplyr::tibble(x = c(0, w) + l0 + s2 + 2 * w + 2* s1 + s3, y = 2.3)
 
-p <- ggplot2::ggplot(data = x, mapping = ggplot2::aes(x = t, y = ppc, color = type, ymin = ppc_lower, ymax = ppc_upper)) +
-  ggplot2::geom_line(size = 1) +
-  ggplot2::geom_ribbon(alpha = 0.3, show.legend = FALSE, linewidth = 0, fill = colour) +
-  ggplot2::scale_color_manual(
-    name = NULL,
-    values = c("Exposures" = colour)
-  ) +
+p <- ggplot2::ggplot() +
   ggplot2::geom_line(
     data = erasToPlot,
     mapping = ggplot2::aes(x = x, y = y, group = era_id),
-    colour = colour,
+    colour = cole,
     inherit.aes = FALSE,
     size = 1.5
   ) +
@@ -153,7 +150,7 @@ p <- ggplot2::ggplot(data = x, mapping = ggplot2::aes(x = t, y = ppc, color = ty
     family = "Graphik"
   ) +
   ggplot2::geom_text(
-    mapping = ggplot2::aes(x = -73, y = 0.5, label = "Proportion of Patients Covered"),
+    mapping = ggplot2::aes(x = -73, y = 0.5, label = "Proportion of Patients Covered (PPC)"),
     data = dplyr::tibble(),
     inherit.aes = FALSE,
     color = "black",
@@ -174,7 +171,7 @@ p <- ggplot2::ggplot(data = x, mapping = ggplot2::aes(x = t, y = ppc, color = ty
     mapping = ggplot2::aes(x = x, y = y),
     data = leg1,
     inherit.aes = FALSE,
-    color = colour,
+    color = cole,
     size = 1.5
   ) +
   ggplot2::geom_line(
@@ -184,6 +181,37 @@ p <- ggplot2::ggplot(data = x, mapping = ggplot2::aes(x = t, y = ppc, color = ty
     color = "black",
     size = 4,
     alpha = 0.5
+  ) +
+  ggplot2::geom_line(
+    mapping = ggplot2::aes(x = x, y = y),
+    data = leg3,
+    inherit.aes = FALSE,
+    color = colp,
+    size = 4,
+    alpha = 0.3
+  ) +
+  ggplot2::geom_line(
+    mapping = ggplot2::aes(x = x, y = y),
+    data = leg3,
+    inherit.aes = FALSE,
+    color = colp,
+    size = 1
+  ) +
+  # ppc
+  ggplot2::geom_line(
+    data = x,
+    mapping = ggplot2::aes(x = t, y = ppc),
+    size = 1,
+    color = colp,
+    inherit.aes = FALSE
+  ) +
+  ggplot2::geom_ribbon(
+    data = x,
+    mapping = ggplot2::aes(x = t, y = ppc, ymin = ppc_lower, ymax = ppc_upper),
+    alpha = 0.3,
+    show.legend = FALSE,
+    linewidth = 0,
+    fill = colp
   ) +
   ggplot2::scale_y_continuous(
     labels = scales::percent_format(accuracy = 0.1),
