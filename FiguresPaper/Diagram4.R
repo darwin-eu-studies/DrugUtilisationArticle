@@ -10,18 +10,14 @@ exposures <- dplyr::tribble(
   1, 0, 100, "A", 0,
   1, 200, 295, "A", 0,
   1, 296, 350, "B", 0,
-  2, 113, 250, "A", 1,
-  2, 205, 300, "B", -1,
-  2, 301, 340, "C", 0,
-  2, 341, 350, "A", 0,
+  2, 13, 150, "A", 1,
+  2, 105, 200, "B", -1,
+  2, 201, 240, "C", 0,
+  2, 241, 280, "A", 0,
   3, 150, 210, "C", 1,
   3, 190, 245, "A", -1
 ) |>
   dplyr::mutate(exposure_id = dplyr::row_number(), type = paste0("Treatment ", type))
-
-notObs <- dplyr::tibble(
-  person_id = 5, start = 325, end =
-)
 
 off <- 0.1
 y1 <- 11
@@ -34,7 +30,7 @@ disc1 <- exposures |>
   dplyr::filter(type == "Treatment A") |>
   dplyr::mutate(
     x = end,
-    y = person_id + y1 + offset * off,
+    y = person_id + y1,
     id = dplyr::row_number(),
     type = "Discontinuation"
   ) |>
@@ -44,12 +40,20 @@ disc2 <- exposures |>
   dplyr::arrange(person_id, -end) |>
   dplyr::mutate(
     x = 0,
-    offset = dplyr::if_else(person_id == 3, 0, offset),
     id = dplyr::row_number(),
-    y = id + y2 + offset * off,
+    y = id + y2,
     type = "Discontinuation"
   ) |>
   dplyr::select("x", "y", "id", "type")
+disc3 <- dplyr::tibble(
+  x = 0,
+  y = 1:3 + y3,
+  id = c(1, 3, 5),
+  type = "Discontinuation"
+)
+disc <- disc1 |>
+  dplyr::union_all(disc2) |>
+  dplyr::union_all(disc3)
 
 # exposures
 exp1 <- exposures |>
@@ -99,113 +103,139 @@ exp <- exp1 |>
   dplyr::group_by(exposure_id, group) |>
   dplyr::mutate(exposure_id = dplyr::cur_group_id())
 
-ggplot2::ggplot() +
-  # initial exposures
+# not in observation
+notObs <- dplyr::tibble(
+  y = c(3 + y1, 5 + y2, 3 + y3),
+  start = c(325, 105, 105),
+  end = 350,
+  type = "Not in observation"
+) |>
+  dplyr::mutate(group = dplyr::row_number()) |>
+  tidyr::pivot_longer(c("start", "end"), names_to = NULL, values_to = "x")
+
+# tables
+dplyr::tibble(
+  "Treatment" = rep(c("restart", "switch", "restart and switch", "untreated"), 2),
+  "follow-up (days)" = rep(c(90, 180), each = 4),
+  estimate_name = "rand",
+  estimate_type = "character",
+  estimate_value = paste0(c("0", "40", "0", "60", "20", "20", "20", "40"), "%")
+) |>
+  visOmopResults::visTable(header = "follow-up (days)", hide = c("estimate_name", "estimate_type"))
+dplyr::tibble(
+  "Treatment" = rep(c("restart", "switch", "restart and switch", "untreated"), 2),
+  "follow-up (days)" = rep(c(90, 180), each = 4),
+  estimate_name = "rand",
+  estimate_type = "character",
+  estimate_value = paste0(c("0", "33.3", "0", "66.7", "33.3", "0", "33.3", "33.3"), "%")
+) |>
+  visOmopResults::visTable(header = "follow-up (days)", hide = c("estimate_name", "estimate_type"))
+
+# persons
+persons <- dplyr::tibble(
+  x = -20,
+  y = c(1:3 + y3, 1:5 + y2, 1:3 + y1),
+  lab = c(1, 2, 3, 1, 1, 2, 2, 3, 1, 2, 3)
+)
+
+# legend
+y <- 17
+x0 <- 0
+w <- 16
+w1 <- 6
+s <- 2
+s1 <- 77
+s2 <- 55
+legendlabs <- dplyr::tribble(
+  ~x, ~lab,
+  w + s, "Not in observation",
+  2 * w + 2 * s + s1, "Treatment A",
+  3 * w + 3 * s + s1 + s2, "Treatment B",
+  4 * w + 4 * s + s1 + 2 * s2, "Treatment C",
+  4 * w + w1 + 5 * s + s1 + 3 * s2, "Discontinuation"
+) |>
+  dplyr::mutate(x = x + x0, y = y)
+legendLines <- dplyr::tibble(
+  x1 = c(0, w + s + s1, 2 * w + 2 * s + s1 + s2, 3 * w + 3 * s + s1 + 2 * s2),
+  type = c("Not in observation", "Treatment A", "Treatment B", "Treatment C")
+) |>
+  dplyr::mutate(x1 = x1 + x0, x2 = x1 + w, y = y, id = dplyr::row_number()) |>
+  tidyr::pivot_longer(c("x1", "x2"), names_to = NULL, values_to = "x")
+legendDot <- dplyr::tibble(x = x0 + 4 * w + 5 * s + s1 + 3 * s2, y = y)
+
+p <- ggplot2::ggplot() +
+  # exposures
   ggplot2::geom_line(
     mapping = ggplot2::aes(x = x, y = y, colour = type, group = exposure_id),
     data = exp,
     size = 2
   ) +
+  # not observation
+  ggplot2::geom_line(
+    mapping = ggplot2::aes(x = x, y = y, colour = type, group = group),
+    data = notObs,
+    size = 3.5,
+    alpha = 0.5
+  ) +
+  # disc
   ggplot2::geom_point(
     mapping = ggplot2::aes(x = x, y = y, colour = type),
-    data = disc1,
+    data = disc,
     size = 4
   ) +
   ggplot2::geom_text(
     mapping = ggplot2::aes(x = x, y = y, label = id),
-    data = disc1,
+    data = disc,
     size = 3.5,
     family = "Graphik",
     colour = "white"
   ) +
-  # restrictToFirstDiscontinuation = FALSE
-  ggplot2::geom_point(
-    mapping = ggplot2::aes(x = x, y = y, colour = type),
-    data = disc2,
-    size = 4
+  # persons
+  ggimage::geom_image(
+    mapping = ggplot2::aes(x = x, y = y, image = "./person.png"),
+    data = persons,
+    inherit.aes = FALSE,
+    size = 0.06
   ) +
   ggplot2::geom_text(
-    mapping = ggplot2::aes(x = x, y = y, label = id),
-    data = disc2,
-    size = 3.5,
-    family = "Graphik",
-    colour = "white"
-  ) +
-  # axis
-  ggplot2::geom_text(
-    mapping = ggplot2::aes(x = 0, y = c(15, 10.5, 4), label = c("Exposures", "restrictToFirstDiscontinuation = FALSE", "restrictToFirstDiscontinuation = TRUE")),
-    data = NULL,
-    size = 4.5,
-    family = "Graphik",
-    hjust = 0
-  ) +
-  ggplot2::geom_text(
-    mapping = ggplot2::aes(x = -10, y = c(15, 10.5, 4), label = c("A", "B", "C")),
-    data = NULL,
-    size = 8,
-    family = "Graphik",
-  ) +
-  # ggplot2::geom_line(
-  #   mapping = ggplot2::aes(x = c(-3, 53), y = -0.55),
-  #   data = NULL,
-  #   colour = "black",
-  #   inherit.aes = FALSE,
-  #   size = 0.4
-  # ) +
-  # ggplot2::geom_text(
-  #   mapping = ggplot2::aes(x = 25, y = -1.5, label = "Time (days)"),
-  #   data = NULL,
-  #   size = 5,
-  #   family = "Graphik"
-  # ) +
-  ggplot2::scale_color_manual(
-    name = NULL,
-    values = c("Treatment A" = col1, "Treatment B" = col2, "Treatment C" = col3, "Discontinuation" = col4, "Not in observation" = col0)
-  ) +
-  ggplot2::coord_cartesian(xlim = c(0, 500), ylim = c(0.75, 15.5), clip = "off") +
-  ggplot2::scale_y_continuous(breaks = NULL, name = "") +
-  ggplot2::scale_x_continuous(name = "", breaks = seq(0, 350, by = 50)) +
-  ggplot2::theme(
-    legend.position = "none",
-    axis.line.x = ggplot2::element_line(linewidth = 0),
-    legend.text = ggplot2::element_text(size = 12),
-    plot.background = ggplot2::element_rect(fill = "white", color = NA),
-    panel.background = ggplot2::element_rect(fill = "white", color = NA),
-    text = ggplot2::element_text(size = 14, family = "Graphik")
-  )
-# persons
-ggimage::geom_image(
-  mapping = ggplot2::aes(x = -70, y = 1:5, image = "./person.png"),
-  data = dplyr::tibble(),
-  inherit.aes = FALSE,
-  size = 0.12
-) +
-  ggplot2::geom_text(
-    mapping = ggplot2::aes(x = -70, y = 1:5, label = 1:5),
-    data = dplyr::tibble(),
+    mapping = ggplot2::aes(x = x, y = y, label = lab),
+    data = persons,
     inherit.aes = FALSE,
     color = "white",
     nudge_y = 0.08,
-    size = 3.2,
+    size = 2.5,
     family = "Graphik"
   ) +
   # vertical lines
   ggplot2::geom_line(
     mapping = ggplot2::aes(x = x, y = y, group = group),
     data = dplyr::tibble(
-      x = c(-60.5, -30.5, -0.5, 0.5, 30.5, 60.5),
-      y1 = 0.5,
-      y2 = 5.8,
-    ) |>
-      dplyr::mutate(group = dplyr::row_number()) |>
-      tidyr::pivot_longer(c("y1", "y2"), names_to = NULL, values_to = "y"),
+      x = c(rep(90, 4), rep(180, 4)),
+      y = rep(c(c(0, 3) + y3, c(0, 5) + y2) + 0.5, 2),
+      group = rep(1:4, each = 2),
+    ),
     linetype = "dashed",
     colour = "black",
+    inherit.aes = FALSE
+  ) +
+  # tables
+  ggimage::geom_image(
+    mapping = ggplot2::aes(x = 460, y = 11.5, image = "./table3.png"),
+    data = dplyr::tibble(),
     inherit.aes = FALSE,
-    alpha = 0.5
+    size = 0.55,
+    nudge_x = 0,
+    nudge_y = 0
+  ) +
+  ggimage::geom_image(
+    mapping = ggplot2::aes(x = 460, y = 3, image = "./table4.png"),
+    data = dplyr::tibble(),
+    inherit.aes = FALSE,
+    size = 0.55,
+    nudge_x = 0,
+    nudge_y = 0
   ) +
   # legend
-
   ggplot2::geom_text(
     mapping = ggplot2::aes(x = x, y = y, label = lab),
     data = legendlabs,
@@ -222,25 +252,55 @@ ggimage::geom_image(
     mapping = ggplot2::aes(x = x, y = y, colour = type),
     data = legendLines |>
       dplyr::filter(id != 1),
-    size = 3,
-    alpha = 0.8
+    size = 3
   ) +
-  # tables
-  ggimage::geom_image(
-    mapping = ggplot2::aes(x = 120, y = 6, image = "./table1.png"),
-    data = dplyr::tibble(),
-    inherit.aes = FALSE,
-    size = 0.65,
-    nudge_x = 0,
-    nudge_y = 0
+  ggplot2::geom_point(
+    mapping = ggplot2::aes(x = x, y = y),
+    data = legendDot,
+    size = 4,
+    colour = col4
   ) +
-  ggimage::geom_image(
-    mapping = ggplot2::aes(x = 120, y = 2, image = "./table2.png"),
-    data = dplyr::tibble(),
+  # axis
+  # ggplot2::geom_text(
+  #   mapping = ggplot2::aes(x = 0, y = c(15, 10.5, 4), label = c("Exposures", "restrictToFirstDiscontinuation = FALSE", "restrictToFirstDiscontinuation = TRUE")),
+  #   data = NULL,
+  #   size = 4.5,
+  #   family = "Graphik",
+  #   hjust = 0
+  # ) +
+  ggplot2::geom_text(
+    mapping = ggplot2::aes(x = c(-10, -10, -10, 375, 375), y = c(15, 10.5, 4, 15, 6.7), label = c("A", "B", "C", "D", "E")),
+    data = NULL,
+    size = 8,
+    family = "Graphik",
+  ) +
+  ggplot2::geom_line(
+    mapping = ggplot2::aes(x = c(-10, 360), y = 0.03),
+    data = NULL,
+    colour = "black",
     inherit.aes = FALSE,
-    size = 0.65,
-    nudge_x = 0,
-    nudge_y = 0
+    size = 0.4
+  ) +
+  ggplot2::geom_text(
+    mapping = ggplot2::aes(x = 350/2, y = -1.1, label = "Time (days)"),
+    data = NULL,
+    size = 5,
+    family = "Graphik"
+  ) +
+  ggplot2::scale_color_manual(
+    name = NULL,
+    values = c("Treatment A" = col1, "Treatment B" = col2, "Treatment C" = col3, "Discontinuation" = col4, "Not in observation" = col0)
+  ) +
+  ggplot2::coord_cartesian(xlim = c(0, 520), ylim = c(0.75, 17), clip = "off") +
+  ggplot2::scale_y_continuous(breaks = NULL, name = "") +
+  ggplot2::scale_x_continuous(name = "", breaks = seq(0, 350, by = 50)) +
+  ggplot2::theme(
+    legend.position = "none",
+    axis.line.x = ggplot2::element_line(linewidth = 0),
+    legend.text = ggplot2::element_text(size = 12),
+    plot.background = ggplot2::element_rect(fill = "white", color = NA),
+    panel.background = ggplot2::element_rect(fill = "white", color = NA),
+    text = ggplot2::element_text(size = 14, family = "Graphik")
   )
 
 p
@@ -248,8 +308,8 @@ p
 ggplot2::ggsave(
   filename = "./Figures/Diagram4.png",
   plot = p,
-  width = 974*3,
-  height = 426*3,
+  width = 982*3,
+  height = 505*3,
   units = "px",
   dpi = 300
 )
