@@ -30,6 +30,12 @@ p <- ggplot2::ggplot() +
     color = "black"
   ) +
   ggplot2::geom_text(
+    mapping = ggplot2::aes(x = c(5.5, 9.5, 27), y = c(5, 4, 4.5), label = c(1, 2,3)),
+    nudge_y = -0.4,
+    size = 4,
+    family = "Graphik"
+  ) +
+  ggplot2::geom_text(
     mapping = ggplot2::aes(x = 35/2, y = -1.4, label = "Time"),
     size = 6,
     family = "Graphik"
@@ -75,7 +81,7 @@ p <- ggplot2::ggplot() +
     name = NULL,
     values = c("Exposures" = exposures, "Eras" = era)
   ) +
-  ggbrace::stat_brace(mapping = aes(x = x, y = y), data = x2) +
+  ggbrace::stat_brace(mapping = ggplot2::aes(x = x, y = y), data = x2) +
   ggplot2::xlim(c(-8, 35)) +
   ggplot2::ylim(c(-2, 7)) +
   ggplot2::theme_void() +
