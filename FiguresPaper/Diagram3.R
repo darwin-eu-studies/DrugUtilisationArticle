@@ -112,6 +112,35 @@ ggplot2::ggplot() +
     size = 3.5,
     hjust = 0
   ) +
+  # initial quantity
+  ggplot2::geom_text(
+    mapping = ggplot2::aes(x = 0, y = 6 - 2, label = "initial quantity"),
+    family = "Graphik",
+    hjust = 0
+  ) +
+  ggplot2::geom_line(
+    mapping = ggplot2::aes(x = c(0, 25), y = 7.3 - 4),
+    colour = col4,
+    size = 1
+  ) +
+  # cumulative quantity
+  ggplot2::geom_text(
+    mapping = ggplot2::aes(x = 0, y = 6 - 3, label = "cumulative quantity"),
+    family = "Graphik",
+    hjust = 0
+  ) +
+  ggplot2::geom_line(
+    mapping = ggplot2::aes(x = c(0, 25, 30, 45), y = 7.3 - 5, group = c(1, 1, 2, 2)),
+    colour = col4,
+    size = 1
+  ) +
+  ggplot2::geom_text(
+    mapping = ggplot2::aes(x = c(12.5, 37.5, 22.5), y = c(7.55, 7.55, 6.85) - 5, label = c("31", "11", "46")),
+    family = "Graphik",
+    size = 3.5
+  ) +
+  # initial daily dose
+  # cumulative dose
   # axis
   ggplot2::geom_line(
     mapping = ggplot2::aes(x = c(-3, 53), y = -0.55),

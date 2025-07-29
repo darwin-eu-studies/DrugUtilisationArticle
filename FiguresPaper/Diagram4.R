@@ -275,14 +275,14 @@ p <- ggplot2::ggplot() +
     family = "Graphik",
   ) +
   ggplot2::geom_line(
-    mapping = ggplot2::aes(x = c(-10, 360), y = 0.03),
+    mapping = ggplot2::aes(x = c(-10, 360), y = -0.05),
     data = NULL,
     colour = "black",
     inherit.aes = FALSE,
     size = 0.4
   ) +
   ggplot2::geom_text(
-    mapping = ggplot2::aes(x = 350/2, y = -1.1, label = "Time (days)"),
+    mapping = ggplot2::aes(x = 350/2, y = -1.2, label = "Time (days)"),
     data = NULL,
     size = 5,
     family = "Graphik"
